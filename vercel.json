@@ -1,12 +1,6 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "WorkWiseAI/package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "WorkWiseAI/dist" }
-    }
-  ],
+  "buildCommand": "cd WorkWiseAI && npm install && npm run build",
+  "outputDirectory": "WorkWiseAI/dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
