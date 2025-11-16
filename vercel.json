@@ -1,7 +1,0 @@
-{
-  "buildCommand": "cd WorkWiseAI && npm install && npm run build",
-  "outputDirectory": "WorkWiseAI/dist",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
