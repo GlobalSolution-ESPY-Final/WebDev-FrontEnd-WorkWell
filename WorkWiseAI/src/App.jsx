@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Skills from './pages/Skills'
 import Motivational from './pages/Motivational'
 import Networking from './pages/Networking'
+import Account from './pages/Account'
 import Nav from './components/Nav'
 import PrivateRoute from './components/PrivateRoute'
 
@@ -21,6 +22,7 @@ return (
 <Route path="/skills" element={<Skills />} />
 <Route path="/motivational" element={<Motivational />} />
 <Route path="/networking" element={<Networking />} />
+<Route path="/account" element={<Account />} />
 </Route>
 
 

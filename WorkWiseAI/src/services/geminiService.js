@@ -173,6 +173,74 @@ Faça uma resposta personalizada, prática e curta (3-6 frases) para ajudar a es
 }
 
 /**
+ * Versão estendida que inclui histórico de mensagens de vários usuários como contexto.
+ * @param {Object} params - { name, area, text, history, allUsers }
+ * history: Array<{email,text}> das últimas mensagens globais
+ * allUsers: Array<{name,area,email}> todos usuários registrados
+ */
+export async function getMotivationalReplyWithHistory({ name, area, text, history, allUsers }) {
+  const examples = (history || [])
+    .filter(m => m.email !== 'ai@system') // Remove respostas da IA do contexto
+    .slice(-40)
+    .map(m => `Funcionário (área desconhecida): ${m.text}`) // Anonimiza
+    .join('\n');
+
+  // Lista de usuários por área (para recomendações)
+  const usersByArea = (allUsers || []).reduce((acc, u) => {
+    if (u.area && u.name) {
+      if (!acc[u.area]) acc[u.area] = [];
+      acc[u.area].push({ name: u.name, email: u.email });
+    }
+    return acc;
+  }, {});
+
+  const availableAreas = Object.keys(usersByArea).join(', ');
+  
+  const usersContext = availableAreas 
+    ? `\n\nUSUÁRIOS DISPONÍVEIS POR ÁREA:\n${Object.entries(usersByArea).map(([area, users]) => 
+        `- ${area}: ${users.map(u => u.name).join(', ')}`
+      ).join('\n')}`
+    : '';
+
+  const prompt = `Você é a WorkWell AI, uma assistente corporativa profissional focada em bem-estar mental e integração entre setores da empresa.
+
+SEU PROPÓSITO:
+- Apoiar emocionalmente funcionários de todas as áreas
+- Facilitar comunicação entre departamentos
+- Promover saúde mental no ambiente corporativo
+- Oferecer orientações práticas e profissionais
+- RECOMENDAR USUÁRIOS de áreas específicas quando o funcionário mencionar precisar de ajuda
+
+CONTEXTO ANÔNIMO DE OUTROS FUNCIONÁRIOS (use para entender clima organizacional):
+${examples}
+${usersContext}
+
+---
+FUNCIONÁRIO ATUAL:
+Nome: ${name}
+Área: ${area}
+Mensagem: "${text}"
+
+INSTRUÇÕES DE RESPOSTA:
+1. Tom profissional mas empático e acolhedor
+2. 3-6 frases objetivas
+3. Ofereça 1 ação prática aplicável no trabalho
+4. **IMPORTANTE**: Se o funcionário mencionar precisar de ajuda de uma área específica (ex: TI, RH, Vendas, Design, etc), RECOMENDE usuários dessa área usando o formato:
+   "Recomendo conversar com [Nome] da área de [Área]"
+5. Se houver múltiplos usuários da área mencionada, sugira até 2 pessoas
+6. Mantenha foco em saúde mental corporativa e integração entre áreas
+7. Nunca revele emails ou dados sensíveis`;
+
+  try {
+    const response = await callGemini(prompt);
+    return response;
+  } catch (error) {
+    console.error('Erro ao gerar resposta motivacional com histórico:', error);
+    throw error;
+  }
+}
+
+/**
  * Gera uma sugestão de menu (exemplo adicional)
  * @param {string} userPreference - Preferência do usuário
  * @returns {Promise<string>} - Sugestão

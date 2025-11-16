@@ -1,0 +1,149 @@
+{
+  "users": [
+    {
+      "id": "u_1763307312936",
+      "email": "mateussmcruz@icloud.com",
+      "name": "Mateus",
+      "area": "TI",
+      "avatar": "http://localhost:5176/uploads/avatar_1763310199075.jpg",
+      "createdAt": "2025-11-16T15:35:12.937Z",
+      "bio": "Trabalho desenvolvendo sites com aplicação em API para revolucionar seu negócio!",
+      "projectsCount": 5,
+      "mainProjectUrl": "https://tuco2006.github.io/MachinePay.github.io/"
+    },
+    {
+      "id": "u_1763307377643",
+      "email": "davismcruz@icloud.com",
+      "name": "Davi",
+      "area": "Marketing",
+      "avatar": "https://www.gravatar.com/avatar/ecd19183fd768a2f3f60e5b1703a9215?d=identicon&s=128",
+      "createdAt": "2025-11-16T15:36:17.643Z"
+    },
+    {
+      "id": "u_1763311865802",
+      "email": "bilidias00@gmail.com",
+      "name": "Larissa",
+      "area": "Arquitetura e design",
+      "avatar": "https://www.gravatar.com/avatar/23e4df33dff4a873aaa0be6a011fe14c?d=identicon&s=128",
+      "createdAt": "2025-11-16T16:51:05.803Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m_1763307332548",
+      "email": "mateussmcruz@icloud.com",
+      "text": "Estou me sentindo super produtivo hoje!",
+      "timestamp": "2025-11-16T15:35:32.548Z"
+    },
+    {
+      "id": "m_1763307335319",
+      "email": "ai@system",
+      "text": "Mateus, que notícia fantástica! Adoro essa energia contagiante da produtividade. Aproveite ao máximo esse fluxo! É nesses momentos que a gente consegue avançar nos projetos e sentir aquela satisfação no trabalho. Que tal aproveitar essa motivação extra para planejar a próxima semana e já adiantar algumas tarefas? Continue assim!\n",
+      "timestamp": "2025-11-16T15:35:35.319Z"
+    },
+    {
+      "id": "m_1763307415578",
+      "email": "davismcruz@icloud.com",
+      "text": "estou mal hoje",
+      "timestamp": "2025-11-16T15:36:55.578Z"
+    },
+    {
+      "id": "m_1763307418265",
+      "email": "ai@system",
+      "text": "Davi, sinto muito que o dia esteja difícil. Acontece com todo mundo, viu? O importante é não deixar isso te abalar por muito tempo. Que tal dar uma pausa rápida, tomar um café e respirar fundo? Às vezes, um pequeno descanso faz toda a diferença para recarregar as energias e voltar com a criatividade a mil no Marketing! Se cuida e levanta a cabeça!\n",
+      "timestamp": "2025-11-16T15:36:58.265Z"
+    },
+    {
+      "id": "m_1763307446164",
+      "email": "davismcruz@icloud.com",
+      "text": "quero montar um projeto de blackfriday será que alguém quer me ajudar?",
+      "timestamp": "2025-11-16T15:37:26.164Z"
+    },
+    {
+      "id": "m_1763307447552",
+      "email": "ai@system",
+      "text": "Davi, que excelente iniciativa! A Black Friday é uma oportunidade incrível para o Marketing brilhar. Com certeza vai ser um projeto desafiador, mas super recompensador. Que tal começar organizando um brainstorming com a equipe para levantar ideias e definir os objetivos principais? Tenho certeza que juntos vocês vão criar algo sensacional! Conte comigo no que precisar.\n",
+      "timestamp": "2025-11-16T15:37:27.552Z"
+    },
+    {
+      "id": "m_1763307896481",
+      "email": "mateussmcruz@icloud.com",
+      "text": "estou ficando sobrecarregado",
+      "timestamp": "2025-11-16T15:44:56.481Z"
+    },
+    {
+      "id": "m_1763307899104",
+      "email": "ai@system",
+      "text": "Olá, Mateus! Sinto muito que você esteja se sentindo sobrecarregado. É importante reconhecer seus limites e buscar formas de aliviar essa pressão.\n\nQue tal começar priorizando suas tarefas e focando nas mais urgentes? Uma dica é usar a matriz de Eisenhower para categorizar suas atividades.\n\nSe precisar de apoio para gerenciar suas demandas ou identificar oportunidades de otimização, podemos te conectar com a área de Gestão de Projetos. Lembre-se, sua saúde mental é prioridade!\n",
+      "timestamp": "2025-11-16T15:44:59.104Z"
+    },
+    {
+      "id": "m_1763310226801",
+      "email": "mateussmcruz@icloud.com",
+      "text": "estou ótimo, desenvolvi um projeto de software para totem de autoatendimento",
+      "timestamp": "2025-11-16T16:23:46.801Z"
+    },
+    {
+      "id": "m_1763310229158",
+      "email": "ai@system",
+      "text": "Olá, Mateus! Que notícia fantástica! É muito gratificante ver seu entusiasmo e sucesso com o projeto do software para totem de autoatendimento.\n\nParabéns pela sua dedicação e iniciativa! Para manter essa energia positiva, que tal compartilhar um breve resumo do seu projeto com a equipe de comunicação interna para inspirar outros colegas? Celebrar essas conquistas fortalece o espírito de equipe e o bem-estar geral. Além disso, considere reservar um tempo para um breve descanso e recarregar as energias após a conclusão do projeto.\n",
+      "timestamp": "2025-11-16T16:23:49.158Z"
+    },
+    {
+      "id": "m_1763311026959",
+      "email": "davismcruz@icloud.com",
+      "text": "estou conseguindo progredir bem nos meus projetos hoje, queria ajuda do setor de TI para dar continuidade no projeto de black friday",
+      "timestamp": "2025-11-16T16:37:06.959Z",
+      "conversation": "davismcruz@icloud.com"
+    },
+    {
+      "id": "m_1763311029309",
+      "email": "ai@system",
+      "text": "Olá Davi, que ótimo saber do seu progresso! Vejo que a Black Friday está te motivando.\n\nPara otimizar sua colaboração com o setor de TI, sugiro agendar uma breve reunião para alinhar expectativas e definir um cronograma conjunto. Lembre-se que uma comunicação clara evita sobrecarga e promove um ambiente de trabalho mais saudável. Se precisar, posso te ajudar a encontrar os responsáveis na área de TI para facilitar essa conexão.",
+      "timestamp": "2025-11-16T16:37:09.309Z",
+      "conversation": "davismcruz@icloud.com"
+    },
+    {
+      "id": "m_1763311053904",
+      "email": "davismcruz@icloud.com",
+      "text": "quero ajuda para encontrar os prodfissionais de ti",
+      "timestamp": "2025-11-16T16:37:33.904Z",
+      "conversation": "davismcruz@icloud.com"
+    },
+    {
+      "id": "m_1763311055472",
+      "email": "ai@system",
+      "text": "Olá Davi, compreendo sua necessidade de encontrar os profissionais de TI. Para otimizar essa busca, sugiro que você utilize a plataforma interna de comunicação da empresa e publique sua demanda detalhadamente, especificando as habilidades e conhecimentos que você precisa para o seu projeto. Isso facilitará a identificação dos profissionais de TI mais adequados e demonstrará proatividade na busca por soluções.\n\nAlém disso, o setor de Recursos Humanos pode te ajudar a identificar os profissionais ideais. Lembre-se que colaborar com outras áreas da empresa é fundamental para um ambiente de trabalho mais integrado e para o sucesso dos projetos. Boa sorte!\n",
+      "timestamp": "2025-11-16T16:37:35.472Z",
+      "conversation": "davismcruz@icloud.com"
+    },
+    {
+      "id": "m_1763311765635",
+      "email": "mateussmcruz@icloud.com",
+      "text": "quero desenvolver um projeto de marketing",
+      "timestamp": "2025-11-16T16:49:25.635Z",
+      "conversation": "mateussmcruz@icloud.com"
+    },
+    {
+      "id": "m_1763311767977",
+      "email": "ai@system",
+      "text": "Olá Mateus, compreendo seu interesse em desenvolver um projeto de marketing. É ótimo ver essa iniciativa! Para te ajudar a dar o pontapé inicial, sugiro que você comece definindo os objetivos principais que você quer alcançar com esse projeto e o público-alvo que deseja atingir. Para te auxiliar nessa jornada, recomendo conversar com Davi da área de Marketing, que pode te dar insights valiosos. Além disso, lembre-se de equilibrar essa nova atividade com suas responsabilidades em TI para evitar sobrecarga.\n",
+      "timestamp": "2025-11-16T16:49:27.977Z",
+      "conversation": "mateussmcruz@icloud.com"
+    },
+    {
+      "id": "m_1763311937819",
+      "email": "bilidias00@gmail.com",
+      "text": "quero criar um quarto inteligente com integração de IA",
+      "timestamp": "2025-11-16T16:52:17.819Z",
+      "conversation": "bilidias00@gmail.com"
+    },
+    {
+      "id": "m_1763311939958",
+      "email": "ai@system",
+      "text": "Olá Larissa, que projeto interessante! A integração de IA no design de interiores de um quarto inteligente é uma ótima ideia. Para começar, que tal você criar um esboço inicial das funcionalidades desejadas e dos aspectos visuais que você imagina? Isso pode te ajudar a organizar suas ideias e comunicar suas necessidades de forma mais clara. Recomendo conversar com Mateus da área de TI para discutir a viabilidade técnica e as melhores abordagens para a integração da IA.\n",
+      "timestamp": "2025-11-16T16:52:19.958Z",
+      "conversation": "bilidias00@gmail.com"
+    }
+  ]
+}

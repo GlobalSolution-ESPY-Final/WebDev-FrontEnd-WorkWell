@@ -9,7 +9,7 @@ return (
 <div>
 <Nav />
 <header className="p-8">
-<h1 className="text-3xl font-bold">Olá, {user?.name}</h1>
+<h1 className="text-3xl font-bold">Olá, {user?.name}! Como está se sentindo hoje?</h1>
 <p className="mt-2 text-sm text-white/70">Área: {user?.area}</p>
 </header>
 
