@@ -9,11 +9,25 @@ export default function Networking() {
     fetch(import.meta.env.VITE_MOCKAPI_URL)
       .then(res => res.json())
       .then(data => {
-        const filtered = data.map(user => ({
-          name: user.name,
-          email: user.email,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`
-        }));
+        const filtered = data.map(user => {
+          // skills/hobbies podem vir como array ou string separada por vírgulas
+          const rawSkills = user.skills ?? user.Skills ?? [];
+          const rawHobbies = user.hobbies ?? user.Hobbies ?? [];
+          const skills = Array.isArray(rawSkills)
+            ? rawSkills
+            : (typeof rawSkills === 'string' ? rawSkills.split(',').map(s=>s.trim()).filter(Boolean) : []);
+          const hobbies = Array.isArray(rawHobbies)
+            ? rawHobbies
+            : (typeof rawHobbies === 'string' ? rawHobbies.split(',').map(s=>s.trim()).filter(Boolean) : []);
+
+          return ({
+            name: user.name,
+            email: user.email,
+            skills,
+            hobbies,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`
+          });
+        });
         setUsers(filtered);
       })
       .catch(err => console.error('Erro ao carregar usuários:', err));
@@ -82,19 +96,27 @@ export default function Networking() {
                     {hoveredIndex === index ? 'Enviar Email' : 'Conectar'}
                   </button>
 
-                  {/* Stats fictícios */}
-                  <div className={`mt-4 pt-4 border-t border-white/10 grid grid-cols-3 gap-2 text-center text-xs text-white/60 transition-all duration-300 ${hoveredIndex === index ? 'opacity-100' : 'opacity-50'}`}>
+                  {/* Skills & Hobbies da API */}
+                  <div className={`mt-4 pt-4 border-t border-white/10 space-y-3 transition-all duration-300 ${hoveredIndex === index ? 'opacity-100' : 'opacity-80'}`}>
                     <div>
-                      <p className="font-semibold text-white/80">Conexões</p>
-                      <p>{Math.floor(Math.random() * 500) + 50}</p>
+                      <p className="font-semibold text-white/80 text-sm mb-1">Skills</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(user.skills && user.skills.length > 0) ? user.skills.slice(0,6).map((s, i) => (
+                          <span key={i} className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80 border border-white/10">{s}</span>
+                        )) : (
+                          <span className="text-xs text-white/50">—</span>
+                        )}
+                      </div>
                     </div>
                     <div>
-                      <p className="font-semibold text-white/80">Endossos</p>
-                      <p>{Math.floor(Math.random() * 100) + 10}</p>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-white/80">Ativo</p>
-                      <p>Sim</p>
+                      <p className="font-semibold text-white/80 text-sm mb-1">Hobbies</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(user.hobbies && user.hobbies.length > 0) ? user.hobbies.slice(0,6).map((h, i) => (
+                          <span key={i} className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80 border border-white/10">{h}</span>
+                        )) : (
+                          <span className="text-xs text-white/50">—</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
