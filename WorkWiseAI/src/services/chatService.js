@@ -1,7 +1,10 @@
-const API_URL = import.meta.env.VITE_CHAT_API_URL || 'http://localhost:5175';
+// Use /api routes for Vercel serverless functions
+// In production, API_URL will be the same domain (relative /api)
+// In development, it falls back to localhost
+const API_URL = import.meta.env.VITE_CHAT_API_URL || (typeof window !== 'undefined' && window.location.origin) || 'http://localhost:3001';
 
 export async function login(email, name, area) {
-  const res = await fetch(`${API_URL}/login`, {
+  const res = await fetch(`${API_URL}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, name, area })
@@ -11,7 +14,7 @@ export async function login(email, name, area) {
 }
 
 export async function sendMessage(email, text, conversation) {
-  const res = await fetch(`${API_URL}/message`, {
+  const res = await fetch(`${API_URL}/api/message`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, text, conversation })
@@ -21,7 +24,7 @@ export async function sendMessage(email, text, conversation) {
 }
 
 export async function getHistory(conversation) {
-  const url = new URL(`${API_URL}/history`);
+  const url = new URL(`${API_URL}/api/history`);
   if(conversation) url.searchParams.set('conversation', conversation);
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error('Erro ao buscar histórico');
@@ -29,13 +32,13 @@ export async function getHistory(conversation) {
 }
 
 export async function listUsers(){
-  const res = await fetch(`${API_URL}/users`);
+  const res = await fetch(`${API_URL}/api/users`);
   if(!res.ok) throw new Error('Erro ao listar usuários');
   return res.json();
 }
 
 export async function getUser(email){
-  const url = new URL(`${API_URL}/user`);
+  const url = new URL(`${API_URL}/api/user`);
   url.searchParams.set('email', email);
   const res = await fetch(url.toString());
   if(!res.ok) throw new Error('Erro ao buscar usuário');
@@ -43,7 +46,7 @@ export async function getUser(email){
 }
 
 export async function updateUser(profile){
-  const res = await fetch(`${API_URL}/user`, {
+  const res = await fetch(`${API_URL}/api/user`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(profile)
@@ -53,12 +56,26 @@ export async function updateUser(profile){
 }
 
 export async function uploadAvatar(file){
-  const fd = new FormData();
-  fd.append('avatar', file);
-  const res = await fetch(`${API_URL}/upload/avatar`, {
-    method: 'POST',
-    body: fd
+  // Convert file to base64 for serverless upload
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const base64 = reader.result;
+        const user = JSON.parse(localStorage.getItem('workwell_user') || '{}');
+        const res = await fetch(`${API_URL}/api/upload-avatar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ file: base64, email: user.email })
+        });
+        if(!res.ok) throw new Error('Falha no upload do avatar');
+        const data = await res.json();
+        resolve(data);
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(new Error('Erro ao ler arquivo'));
+    reader.readAsDataURL(file);
   });
-  if(!res.ok) throw new Error('Falha no upload do avatar');
-  return res.json(); // { url, path }
 }
