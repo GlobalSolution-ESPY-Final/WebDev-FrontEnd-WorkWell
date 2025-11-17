@@ -4,27 +4,34 @@ import Nav from "../components/Nav";
 export default function Networking() {
   const [users, setUsers] = useState([]);
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [expanded, setExpanded] = useState({}); // quais usuários mostram skills/hobbies
+  const [liked, setLiked] = useState({}); // quais usuários foram curtidos
 
   useEffect(() => {
     fetch(import.meta.env.VITE_MOCKAPI_URL)
       .then(res => res.json())
       .then(data => {
         const filtered = data.map(user => {
-          // skills/hobbies podem vir como array ou string separada por vírgulas
+          // skills/hobbies/academica podem vir como array ou string separada por vírgulas
           const rawSkills = user.skills ?? user.Skills ?? [];
           const rawHobbies = user.hobbies ?? user.Hobbies ?? [];
+          const rawAcademica = user.academica ?? user.Academica ?? user.formacao ?? [];
           const skills = Array.isArray(rawSkills)
             ? rawSkills
             : (typeof rawSkills === 'string' ? rawSkills.split(',').map(s=>s.trim()).filter(Boolean) : []);
           const hobbies = Array.isArray(rawHobbies)
             ? rawHobbies
             : (typeof rawHobbies === 'string' ? rawHobbies.split(',').map(s=>s.trim()).filter(Boolean) : []);
+          const academica = Array.isArray(rawAcademica)
+            ? rawAcademica
+            : (typeof rawAcademica === 'string' ? rawAcademica.split(',').map(s=>s.trim()).filter(Boolean) : []);
 
           return ({
             name: user.name,
             email: user.email,
             skills,
             hobbies,
+            academica,
             avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`
           });
         });
@@ -83,42 +90,72 @@ export default function Networking() {
                     </div>
                   </div>
 
-                  {/* Botão de Contato */}
-                  <button
-                    onClick={() => handleSendEmail(user.email, user.name)}
-                    className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                      hoveredIndex === index
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
-                        : 'bg-white/5 text-blue-300 hover:bg-white/10'
-                    }`}
-                  >
-                    <span>✉️</span>
-                    {hoveredIndex === index ? 'Enviar Email' : 'Conectar'}
-                  </button>
-
-                  {/* Skills & Hobbies da API */}
-                  <div className={`mt-4 pt-4 border-t border-white/10 space-y-3 transition-all duration-300 ${hoveredIndex === index ? 'opacity-100' : 'opacity-80'}`}>
-                    <div>
-                      <p className="font-semibold text-white/80 text-sm mb-1">Skills</p>
-                      <div className="flex flex-wrap gap-2">
-                        {(user.skills && user.skills.length > 0) ? user.skills.slice(0,6).map((s, i) => (
-                          <span key={i} className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80 border border-white/10">{s}</span>
-                        )) : (
-                          <span className="text-xs text-white/50">—</span>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-white/80 text-sm mb-1">Hobbies</p>
-                      <div className="flex flex-wrap gap-2">
-                        {(user.hobbies && user.hobbies.length > 0) ? user.hobbies.slice(0,6).map((h, i) => (
-                          <span key={i} className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80 border border-white/10">{h}</span>
-                        )) : (
-                          <span className="text-xs text-white/50">—</span>
-                        )}
-                      </div>
-                    </div>
+                  {/* Ações */}
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleSendEmail(user.email, user.name)}
+                      className={`py-2 px-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition ${
+                        hoveredIndex === index ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' : 'bg-white/5 text-blue-300 hover:bg-white/10'
+                      }`}
+                    >
+                      ✉️ {hoveredIndex === index ? 'Email' : 'Conectar'}
+                    </button>
+                    <button
+                      onClick={() => setExpanded(e => ({ ...e, [index]: !e[index] }))}
+                      className={`py-2 px-3 rounded-lg text-sm font-semibold transition ${expanded[index] ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-white/5 text-purple-300 hover:bg-white/10'}`}
+                    >
+                      {expanded[index] ? 'Ocultar' : 'Ver características'}
+                    </button>
                   </div>
+
+                  <div className="mt-2">
+                    <button
+                      disabled={liked[index]}
+                      onClick={() => setLiked(l => ({ ...l, [index]: true }))}
+                      className={`w-full py-2 px-3 rounded-lg text-sm font-semibold transition ${liked[index] ? 'bg-green-600 text-white' : 'bg-white/5 text-green-300 hover:bg-white/10'}`}
+                    >
+                      {liked[index] ? '👍 Curtido' : '👍 Curtir'}
+                    </button>
+                    {liked[index] && (
+                      <p className="mt-2 text-xs text-green-400">usuário recomendado! obrigado pelo feedback</p>
+                    )}
+                  </div>
+
+                  {/* Skills & Hobbies condicional */}
+                  {expanded[index] && (
+                    <div className={`mt-4 pt-4 border-t border-white/10 space-y-4`}>
+                      <div>
+                        <p className="font-semibold text-white/80 text-sm mb-1">Skills</p>
+                        <div className="flex flex-wrap gap-2">
+                          {(user.skills && user.skills.length > 0) ? user.skills.slice(0,6).map((s, i) => (
+                            <span key={i} className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80 border border-white/10">{s}</span>
+                          )) : (
+                            <span className="text-xs text-white/50">—</span>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white/80 text-sm mb-1">Hobbies</p>
+                        <div className="flex flex-wrap gap-2">
+                          {(user.hobbies && user.hobbies.length > 0) ? user.hobbies.slice(0,6).map((h, i) => (
+                            <span key={i} className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80 border border-white/10">{h}</span>
+                          )) : (
+                            <span className="text-xs text-white/50">—</span>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white/80 text-sm mb-1">Formação Acadêmica</p>
+                        <div className="flex flex-wrap gap-2">
+                          {(user.academica && user.academica.length > 0) ? user.academica.slice(0,6).map((a, i) => (
+                            <span key={i} className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80 border border-white/10">{a}</span>
+                          )) : (
+                            <span className="text-xs text-white/50">—</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

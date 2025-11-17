@@ -1,7 +1,6 @@
-// Local-only backend configuration (Express on http://localhost:3001)
-// If VITE_CHAT_API_URL is defined, it will be used; otherwise default to local Express.
+// crie um arquivo .env com a seguinte informação: GEMINI_API_KEY=AIzaSyBTSTGYe2Rye9yJDkIfcnetyQU49PiyQlw
 const envUrl = import.meta.env.VITE_CHAT_API_URL;
-const API_BASE = envUrl || 'http://localhost:3001';
+const API_BASE = envUrl || 'http://localhost:3002';
 
 export async function login(email, name, area) {
   const res = await fetch(`${API_BASE}/login`, {

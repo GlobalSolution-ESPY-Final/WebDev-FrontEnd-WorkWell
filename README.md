@@ -45,6 +45,70 @@ MockAPI para simulação do backend
 Axios para requisições HTTP
 Multer (upload de avatar) + Express (API interna)
 
+## ⚙️ Configuração do Projeto (IMPORTANTE)
+
+### 📋 Pré-requisitos
+
+- Node.js (versão 14 ou superior)
+- npm ou yarn
+- Chave de API do Google Gemini ([obter aqui](https://makersuite.google.com/app/apikeys))
+
+### 🔧 Instalação
+
+1. **Clone o repositório**
+```bash
+git clone https://github.com/GlobalSolution-ESPY-Final/WebDev-FrontEnd-WorkWell.git
+cd WebDev-FrontEnd-WorkWell/WorkWiseAI
+```
+
+2. **Instale as dependências**
+```bash
+npm install
+```
+
+3. **Configure as variáveis de ambiente**
+
+Crie um arquivo `.env` na pasta raiz do projeto (`WorkWiseAI/.env`) com o seguinte conteúdo:
+
+```env
+VITE_MOCKAPI_URL=https://68d33dafcc7017eec54652ba.mockapi.io/users
+```
+
+**⚠️ IMPORTANTE:** Crie também um arquivo `.env` na pasta `server/` (`WorkWiseAI/server/.env`) com a chave do Gemini:
+
+```env
+GEMINI_API_KEY=SUA_CHAVE_AQUI
+```
+
+> **Nota:** Substitua `SUA_CHAVE_AQUI` pela sua chave de API do Google Gemini. Você pode obtê-la gratuitamente em: https://makersuite.google.com/app/apikeys
+
+4. **Inicie o backend (em um terminal)**
+```bash
+cd server
+node chatapi.cjs
+```
+
+O backend será iniciado em `http://localhost:3002`
+
+5. **Inicie o frontend (em outro terminal)**
+```bash
+npm run dev
+```
+
+O frontend será iniciado em `http://localhost:5173`
+
+### 🎯 Estrutura de Arquivos de Ambiente
+
+```
+WorkWiseAI/
+├── .env                    # Configurações do frontend
+├── .env.example           # Template das variáveis (não contém chaves reais)
+└── server/
+    └── .env               # Configurações do backend (contém GEMINI_API_KEY)
+```
+
+**⚠️ Os arquivos `.env` NÃO estão no repositório por questões de segurança. Você precisa criá-los manualmente.**
+
 🚀 Funcionalidades Principais
 🔹 Busca e recomendação de habilidades
 
