@@ -6,11 +6,10 @@ import { sendMessage, getHistory, listUsers } from '../services/chatService'
 export default function Motivational(){
 	const user = JSON.parse(localStorage.getItem('workwell_user'))
 	const [text, setText] = useState('')
-	const [messages, setMessages] = useState([]) // histórico local mostrado
+	const [messages, setMessages] = useState([]) 
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState('')
 
-		// Carrega histórico inicial (somente a conversa do usuário atual)
 	useEffect(()=>{
 		(async ()=>{
 			try{

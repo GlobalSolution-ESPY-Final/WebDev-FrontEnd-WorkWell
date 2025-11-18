@@ -38,6 +38,7 @@ return (
 {skills.title && (
 <div className="mt-6 p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg border border-blue-500/30 mb-6">
 <h3 className="text-xl font-bold text-blue-300">{skills.title}</h3>
+ {skills.warning && <p className="text-xs mt-2 text-yellow-300">{skills.warning}</p>}
 </div>
 )}
 

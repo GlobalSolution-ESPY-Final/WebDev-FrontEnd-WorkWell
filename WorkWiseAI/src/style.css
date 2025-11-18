@@ -4,8 +4,14 @@
 
 
 :root{
---accent: #7C3AED; /* roxo moderno */
+--accent: #7C3AED;
 }
 
 
-body{ background: linear-gradient(180deg,#0f172a 0%, #071124 100%); }
+body.theme-dark {
+	background: linear-gradient(180deg,#0f172a 0%, #071124 100%);
+}
+
+body.theme-light {
+	background: linear-gradient(135deg, #3b82f6 0%, #a78bfa 50%, #1e40af 100%);
+}

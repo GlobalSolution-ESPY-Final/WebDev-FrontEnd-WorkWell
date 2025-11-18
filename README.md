@@ -1,6 +1,6 @@
 ﻿🧠 WorkWell — Plataforma de Suporte, Habilidades, Networking e Colaboração Inteligente
 
-Autores: [Mateus Saavedra, davi falção e Danilo Fernandes] RM: [563266, 561657, 56188]
+Autores: [Mateus Saavedra, davi falção e Danilo Fernandes] RM: [563266, 561657, 561818]
 
 Uma ferramenta moderna desenvolvida para ajudar trabalhadores a encontrarem novas habilidades, receberem apoio emocional via IA e construírem networking profissional de forma rápida e intuitiva.
 
@@ -40,8 +40,6 @@ TailwindCSS
 
 Gemini API (Integração com IA)
 
-MockAPI para simulação do backend
-
 Axios para requisições HTTP
 Multer (upload de avatar) + Express (API interna)
 
@@ -66,18 +64,13 @@ cd WebDev-FrontEnd-WorkWell/WorkWiseAI
 npm install
 ```
 
+
 3. **Configure as variáveis de ambiente**
 
-Crie um arquivo `.env` na pasta raiz do projeto (`WorkWiseAI/.env`) com o seguinte conteúdo:
+**⚠️ IMPORTANTE:** Crie um arquivo `.env` na pasta `server/` (`WorkWiseAI/server/.env`) com a chave do Gemini:
 
 ```env
-VITE_MOCKAPI_URL=https://68d33dafcc7017eec54652ba.mockapi.io/users
-```
-
-**⚠️ IMPORTANTE:** Crie também um arquivo `.env` na pasta `server/` (`WorkWiseAI/server/.env`) com a chave do Gemini:
-
-```env
-GEMINI_API_KEY=SUA_CHAVE_AQUI
+GEMINI_API_KEY=AIzaSyCAiruZOFcWHsVdtlMCj7fYaL0qav6QQ68
 ```
 
 > **Nota:** Substitua `SUA_CHAVE_AQUI` pela sua chave de API do Google Gemini. Você pode obtê-la gratuitamente em: https://makersuite.google.com/app/apikeys
@@ -97,14 +90,14 @@ npm run dev
 
 O frontend será iniciado em `http://localhost:5173`
 
+
 ### 🎯 Estrutura de Arquivos de Ambiente
 
 ```
 WorkWiseAI/
-├── .env                    # Configurações do frontend
 ├── .env.example           # Template das variáveis (não contém chaves reais)
 └── server/
-    └── .env               # Configurações do backend (contém GEMINI_API_KEY)
+	└── .env               # Configurações do backend (contém GEMINI_API_KEY)
 ```
 
 **⚠️ Os arquivos `.env` NÃO estão no repositório por questões de segurança. Você precisa criá-los manualmente.**

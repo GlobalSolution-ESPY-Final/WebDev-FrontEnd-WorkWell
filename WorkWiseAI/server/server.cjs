@@ -9,7 +9,6 @@ const port = process.env.PORT || 5175
 app.use(cors())
 app.use(express.json())
 
-// Simple proxy endpoint to forward requests to Google Generative Language (Gemini)
 app.post('/api/generate', async (req, res) => {
   try {
     console.log('📨 Received request body:', JSON.stringify(req.body, null, 2))
@@ -43,8 +42,6 @@ app.post('/api/generate', async (req, res) => {
     const url = `${endpoint}?key=${apiKey}`
     console.log(`📤 Forwarding to Gemini API...`)
     const response = await axios.post(url, payload, { headers: { 'Content-Type': 'application/json' } })
-
-    // Extract text from Gemini response (new format: candidates[].content.parts[].text)
     const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || response.data?.output || JSON.stringify(response.data)
     console.log('✅ Got response from Gemini')
     return res.status(200).json({ text })

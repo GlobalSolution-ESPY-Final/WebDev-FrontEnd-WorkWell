@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 
@@ -6,6 +6,23 @@ export default function Nav(){
 const navigate = useNavigate()
 const user = JSON.parse(localStorage.getItem('workwell_user') || 'null')
 const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+const [theme, setTheme] = useState(() => localStorage.getItem('workwell_theme') || (document.body.classList.contains('theme-light') ? 'light' : 'dark'))
+
+useEffect(() => {
+  const handler = (e) => {
+    const next = e?.detail
+    if (next === 'light' || next === 'dark') setTheme(next)
+  }
+  window.addEventListener('workwell-theme-change', handler)
+  return () => window.removeEventListener('workwell-theme-change', handler)
+}, [])
+
+function toggleTheme(){
+  const next = theme === 'dark' ? 'light' : 'dark'
+  setTheme(next)
+  localStorage.setItem('workwell_theme', next)
+  window.dispatchEvent(new CustomEvent('workwell-theme-change', { detail: next }))
+}
 
 
 function logout(){
@@ -35,6 +52,13 @@ return (
   <span className="text-white/50 ml-1">({user?.area ?? 'N/A'})</span>
   {user?.email && <span className="block text-xs text-white/40 mt-0.5">{user.email}</span>}
 </div>
+<button
+  onClick={toggleTheme}
+  className="hidden md:block px-3 py-2 bg-purple-600/30 text-purple-200 rounded-lg hover:bg-purple-600/50 border border-purple-600/30 transition-all duration-200 font-semibold text-sm"
+  aria-label="Alternar tema"
+>
+  {theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+</button>
 <button 
   onClick={logout} 
   className="hidden md:block px-4 py-2 bg-red-600/20 text-red-300 rounded-lg hover:bg-red-600/40 border border-red-600/30 transition-all duration-200 hover:shadow-lg font-semibold text-sm"
@@ -71,6 +95,12 @@ return (
       <span className="text-white/50 ml-1">({user?.area ?? 'N/A'})</span>
       {user?.email && <div className="text-xs text-white/40 mt-1">{user.email}</div>}
     </div>
+    <button 
+      onClick={toggleTheme}
+      className="w-full mt-2 px-4 py-3 bg-purple-600/20 text-purple-200 rounded-lg hover:bg-purple-600/40 border border-purple-600/30 transition-all duration-200 font-semibold text-sm"
+    >
+      {theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+    </button>
     <button 
       onClick={logout} 
       className="w-full mt-2 px-4 py-3 bg-red-600/20 text-red-300 rounded-lg hover:bg-red-600/40 border border-red-600/30 transition-all duration-200 font-semibold text-sm"

@@ -9,7 +9,13 @@
  */
 
 const express = require('express');
-require('dotenv').config();
+let dotenvLoaded = false;
+try {
+  require('dotenv').config();
+  dotenvLoaded = true;
+} catch (e) {
+  console.error('⚠️ Falha ao carregar dotenv:', e.message);
+}
 // Polyfill fetch for Node versions < 18
 if (typeof fetch === 'undefined') {
   global.fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
@@ -18,6 +24,20 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const multer = require('multer');
+// Arquivo de log de diagnóstico
+const STARTUP_LOG = path.join(__dirname, 'server_startup.log');
+function logDiag(msg){
+  const line = `[${new Date().toISOString()}] ${msg}\n`;
+  try { fs.appendFileSync(STARTUP_LOG, line); } catch(_){}
+  console.log(msg);
+}
+
+logDiag('Iniciando chatapi.cjs...');
+logDiag(`Node version: ${process.version}`);
+logDiag(`Process cwd: ${process.cwd()}`);
+logDiag(`dotenv carregado: ${dotenvLoaded}`);
+logDiag(`GEMINI_API_KEY presente: ${process.env.GEMINI_API_KEY ? 'sim' : 'não'}`);
+
 const app = express();
 const PORT = process.env.PORT || 3002;
 const DB_PATH = path.join(__dirname, 'chatdb.json');
@@ -25,15 +45,34 @@ const DB_PATH = path.join(__dirname, 'chatdb.json');
 app.use(cors());
 app.use(express.json());
 
+// Rota de saúde simples
+app.get('/ping', (req,res)=>{
+  res.json({ ok: true, time: new Date().toISOString() });
+});
+
+// Middleware de captura de erros das rotas (deve ficar DEPOIS do json middleware e ANTES das rotas que geram respostas assíncronas)
+// (Como nossas rotas assíncronas usam try/catch já, isso é prevenção extra para erros não tratados)
+app.use((err, req, res, next) => {
+  console.error('❌ Erro não tratado na rota:', err.stack || err.message || err);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ error: 'Erro interno inesperado' });
+});
+
 function readDB() {
   try {
-    return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    const raw = fs.readFileSync(DB_PATH, 'utf8');
+    return JSON.parse(raw);
   } catch (e) {
+    logDiag(`⚠️ Erro ao ler DB (${DB_PATH}): ${e.message}`);
     return { users: [], messages: [] };
   }
 }
 function writeDB(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  try {
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  } catch(e){
+    logDiag(`❌ Falha ao escrever DB: ${e.message}`);
+  }
 }
 
 // Gera avatar simples usando hash md5 (gravatar identicon)
@@ -155,7 +194,6 @@ app.put('/user', (req, res) => {
   res.json({ user });
 });
 
-// ===================== Gemini AI Routes (server-side secure key) =====================
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL_PRIMARY = 'gemini-2.0-flash';
 const GEMINI_MODEL_FALLBACK = 'gemini-pro';
@@ -190,6 +228,9 @@ async function geminiCall(prompt, model = GEMINI_MODEL_PRIMARY){
 app.post('/ai/skills', async (req,res)=>{
   const { area } = req.body || {};
   if(!area) return res.status(400).json({ error: 'Área obrigatória' });
+  if(!GEMINI_KEY){
+    return res.status(503).json({ error: 'Gemini não configurado. Defina GEMINI_API_KEY em server/.env' });
+  }
   const prompt = `Você é um assistente que gera 6 habilidades essenciais para alguém que trabalha em ${area}. Para cada habilidade, inclua um título curto e 1-2 frases explicando por que é importante. Formato: lista numerada simples.`;
   try {
     const raw = await geminiCall(prompt);
@@ -204,7 +245,12 @@ app.post('/ai/skills', async (req,res)=>{
     return res.json({ title: titleLine.replace(/^\d+\.\s*/, ''), skills });
   } catch (e){
     console.error('Erro /ai/skills:', e.message);
-    return res.status(500).json({ error: e.message });
+    const mockSkills = Array.from({length:6}).map((_,i)=>({
+      id:`skill_${i}`,
+      title:`Skill ${i+1}`,
+      description:`Exemplo de habilidade em ${area}. (fallback por falha na IA)`
+    }));
+    return res.status(200).json({ title:`Habilidades (fallback) em ${area}`, skills: mockSkills, warning: 'Fallback local: IA indisponível', error: e.message });
   }
 });
 
@@ -212,13 +258,17 @@ app.post('/ai/skills', async (req,res)=>{
 app.post('/ai/motivational', async (req,res)=>{
   const { name, area, text } = req.body || {};
   if(!text) return res.status(400).json({ error: 'Texto obrigatório' });
+  if(!GEMINI_KEY){
+    return res.status(503).json({ error: 'Gemini não configurado. Defina GEMINI_API_KEY em server/.env' });
+  }
   const prompt = `Seja empático e encorajador. Responda para ${name||'Funcionário'}, que atua em ${area||'setor desconhecido'}. O usuário disse: "${text}". Faça uma resposta personalizada, prática e curta (3-6 frases) para ajudar a estabilizar seu emocional no trabalho.`;
   try {
     const reply = await geminiCall(prompt);
     return res.json({ reply });
   } catch(e){
     console.error('Erro /ai/motivational:', e.message);
-    return res.status(500).json({ error: e.message });
+    const mock = `Olá ${name||'colega'}! Entendo sua situação sobre "${text.substring(0,80)}". Respire, priorize uma ação pequena e se possível converse com alguém da área ${area||'relevante'}. (Fallback sem IA)`;
+    return res.status(200).json({ reply: mock, warning: 'Fallback local: IA indisponível', error: e.message });
   }
 });
 
@@ -226,6 +276,9 @@ app.post('/ai/motivational', async (req,res)=>{
 app.post('/ai/motivational-with-history', async (req,res)=>{
   const { name, area, text, history, allUsers } = req.body || {};
   if(!text) return res.status(400).json({ error: 'Texto obrigatório' });
+  if(!GEMINI_KEY){
+    return res.status(503).json({ error: 'Gemini não configurado. Defina GEMINI_API_KEY em server/.env' });
+  }
   const examples = (history||[])
     .filter(m=>m.email !== 'ai@system')
     .slice(-40)
@@ -246,11 +299,27 @@ app.post('/ai/motivational-with-history', async (req,res)=>{
     return res.json({ reply });
   } catch(e){
     console.error('Erro /ai/motivational-with-history:', e.message);
-    return res.status(500).json({ error: e.message });
+    const sampleNames = (allUsers||[]).filter(u=>u?.name).slice(0,2).map(u=>u.name);
+    const suggest = sampleNames.length ? ` Considere conversar com ${sampleNames.join(' e ')}.` : '';
+    const mock = `Força, ${name||'colega'}! Foque em uma ação simples hoje.${suggest} (Fallback sem IA)`;
+    return res.status(200).json({ reply: mock, warning: 'Fallback local: IA indisponível', error: e.message });
   }
 });
 
 // Inicia servidor após registrar todas as rotas
-app.listen(PORT, () => {
-  console.log(`✅ Chat API rodando em http://localhost:${PORT}`);
+try {
+  app.listen(PORT, () => {
+    logDiag(`✅ Chat API rodando em http://localhost:${PORT}`);
+  });
+} catch(e){
+  logDiag(`❌ Falha ao iniciar servidor: ${e.message}`);
+  process.exit(1);
+}
+
+// Handlers de nível de processo para evitar encerramento silencioso
+process.on('unhandledRejection', (reason) => {
+  logDiag('⚠️ Unhandled Rejection: ' + (reason?.stack || reason));
+});
+process.on('uncaughtException', (err) => {
+  logDiag('⚠️ Uncaught Exception: ' + (err?.stack || err?.message || err));
 });
