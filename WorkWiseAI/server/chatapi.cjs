@@ -1,18 +1,40 @@
 /**
  * BACKEND - WorkWell Chat API
  * 
- * ⚠️ IMPORTANTE: Este arquivo requer um arquivo .env na pasta server/ com:
- * GEMINI_API_KEY=sua_chave_aqui
+ * Arquivo de configuração de ambiente (.env):
+ *  - Pode estar em:  raiz do projeto (WorkWiseAI/.env)
+ *  - OU em:         pasta server (WorkWiseAI/server/.env)
+ * 
+ * Variáveis esperadas:
+ *  GEMINI_API_KEY=sua_chave
  * 
  * Obtenha sua chave em: https://makersuite.google.com/app/apikeys
- * Consulte o README.md para mais instruções de configuração.
+ * Se ausente: rotas /ai/* usarão fallback mockado.
  */
 
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
+
+// Carregamento flexível de .env (root ou server/)
 let dotenvLoaded = false;
+let envPathUsed = null;
 try {
-  require('dotenv').config();
-  dotenvLoaded = true;
+  const possiblePaths = [
+    path.join(process.cwd(), '.env'),            // raiz do projeto
+    path.join(__dirname, '.env')                 // dentro de server/
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      require('dotenv').config({ path: p });
+      dotenvLoaded = true;
+      envPathUsed = p;
+      break;
+    }
+  }
+  if (!dotenvLoaded) {
+    console.warn('⚠️ Nenhum arquivo .env encontrado (root ou server/). Usando apenas variáveis de ambiente do sistema.');
+  }
 } catch (e) {
   console.error('⚠️ Falha ao carregar dotenv:', e.message);
 }
@@ -20,8 +42,9 @@ try {
 if (typeof fetch === 'undefined') {
   global.fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 }
-const fs = require('fs');
-const path = require('path');
+// fs e path já carregados acima (mantidos aqui caso outras partes dependam da ordem)
+// const fs = require('fs');
+// const path = require('path');
 const cors = require('cors');
 const multer = require('multer');
 // Arquivo de log de diagnóstico
@@ -36,7 +59,19 @@ logDiag('Iniciando chatapi.cjs...');
 logDiag(`Node version: ${process.version}`);
 logDiag(`Process cwd: ${process.cwd()}`);
 logDiag(`dotenv carregado: ${dotenvLoaded}`);
+logDiag(`.env usado: ${envPathUsed || 'nenhum'}`);
 logDiag(`GEMINI_API_KEY presente: ${process.env.GEMINI_API_KEY ? 'sim' : 'não'}`);
+
+// Bloquear chaves vazadas conhecidas
+const LEAKED_KEYS = [
+  'AIzaSyBTSTGYe2Rye9yJDkIfcnetyQU49PiyQlw',
+  'AIzaSyCAiruZOFcWHsVdtlMCj7fYaL0qav6QQ68'
+];
+if(process.env.GEMINI_API_KEY && LEAKED_KEYS.includes(process.env.GEMINI_API_KEY)){
+  logDiag('⚠️ CHAVE VAZADA DETECTADA! Remova do .env ou variáveis de ambiente.');
+  logDiag('   Servidor usará fallback sem IA. Obtenha nova chave em: https://makersuite.google.com/app/apikeys');
+  delete process.env.GEMINI_API_KEY; // Remove para forçar fallback
+}
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -212,8 +247,14 @@ async function geminiCall(prompt, model = GEMINI_MODEL_PRIMARY){
   });
   if(!res.ok){
     const err = await res.json().catch(()=>({error:{message:res.statusText}}));
+    const msg = (err.error?.message || res.statusText || '').toLowerCase();
+    // Detecta caso de chave vazada informado pelo Google
+    if(msg.includes('reported as leaked')){
+      logDiag('⚠️ Google indicou chave vazada. Desabilitando GEMINI_API_KEY em runtime e usando fallback.');
+      delete process.env.GEMINI_API_KEY;
+    }
     // fallback if model not found
-    if(model === GEMINI_MODEL_PRIMARY && (err.error?.message||'').includes('not found')){
+    if(model === GEMINI_MODEL_PRIMARY && msg.includes('not found')){
       return geminiCall(prompt, GEMINI_MODEL_FALLBACK);
     }
     throw new Error(err.error?.message || res.statusText);
@@ -228,9 +269,22 @@ async function geminiCall(prompt, model = GEMINI_MODEL_PRIMARY){
 app.post('/ai/skills', async (req,res)=>{
   const { area } = req.body || {};
   if(!area) return res.status(400).json({ error: 'Área obrigatória' });
+  
+  // Fallback automático quando chave ausente ou inválida
   if(!GEMINI_KEY){
-    return res.status(503).json({ error: 'Gemini não configurado. Defina GEMINI_API_KEY em server/.env' });
+    logDiag('⚠️ /ai/skills: GEMINI_API_KEY ausente, retornando fallback');
+    const mockSkills = Array.from({length:6}).map((_,i)=>({
+      id:`fallback_${i}`,
+      title:`Habilidade ${i+1} em ${area}`,
+      description:`Conhecimento essencial para profissionais de ${area}. Configure GEMINI_API_KEY para gerar recomendações personalizadas pela IA.`
+    }));
+    return res.status(200).json({ 
+      title:`Habilidades essenciais em ${area}`, 
+      skills: mockSkills, 
+      warning: 'Usando dados de exemplo. Configure GEMINI_API_KEY no server/.env para ativar IA.' 
+    });
   }
+  
   const prompt = `Você é um assistente que gera 6 habilidades essenciais para alguém que trabalha em ${area}. Para cada habilidade, inclua um título curto e 1-2 frases explicando por que é importante. Formato: lista numerada simples.`;
   try {
     const raw = await geminiCall(prompt);
@@ -245,6 +299,9 @@ app.post('/ai/skills', async (req,res)=>{
     return res.json({ title: titleLine.replace(/^\d+\.\s*/, ''), skills });
   } catch (e){
     console.error('Erro /ai/skills:', e.message);
+    if((e.message||'').includes('GEMINI_API_KEY_vazada')){
+      logDiag('⚠️ /ai/skills: chave vazada detectada, retornando fallback amigável');
+    }
     const mockSkills = Array.from({length:6}).map((_,i)=>({
       id:`skill_${i}`,
       title:`Skill ${i+1}`,
@@ -310,6 +367,7 @@ app.post('/ai/motivational-with-history', async (req,res)=>{
 try {
   app.listen(PORT, () => {
     logDiag(`✅ Chat API rodando em http://localhost:${PORT}`);
+    logDiag('   Pressione Ctrl+C para encerrar.');
   });
 } catch(e){
   logDiag(`❌ Falha ao iniciar servidor: ${e.message}`);
@@ -319,7 +377,12 @@ try {
 // Handlers de nível de processo para evitar encerramento silencioso
 process.on('unhandledRejection', (reason) => {
   logDiag('⚠️ Unhandled Rejection: ' + (reason?.stack || reason));
+  // NÃO encerrar processo, só logar
 });
 process.on('uncaughtException', (err) => {
   logDiag('⚠️ Uncaught Exception: ' + (err?.stack || err?.message || err));
+  // NÃO encerrar processo, só logar
 });
+
+// Keepalive: evitar que Node encerre se não houver event loop ativo
+setInterval(()=>{}, 1<<30); // Timer de ~34 anos, mantém processo vivo

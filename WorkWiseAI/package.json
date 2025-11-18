@@ -4,10 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:server": "node server/chatapi.cjs",
-    "dev:api": "node server/chatapi.cjs",
-    "dev:all": "npm-run-all --parallel dev:server dev",
+  "dev": "vite",
+  "server": "node server/chatapi.cjs",
+  "start": "npm-run-all --parallel server dev",
     "build": "vite build",
     "preview": "vite preview"
   },

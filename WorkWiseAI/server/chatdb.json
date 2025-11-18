@@ -179,6 +179,20 @@
       "text": "Força Mateus! A IA está offline, mas você pode focar em uma ação pequena agora e pedir apoio na área TI. Talvez conversar com Mateus e Davi ajude. (fallback local - Falha ao gerar resposta (status 500))",
       "timestamp": "2025-11-18T02:59:13.524Z",
       "conversation": "mateussmcruz@icloud.com"
+    },
+    {
+      "id": "m_1763435587698",
+      "email": "mateussmcruz@icloud.com",
+      "text": "bem",
+      "timestamp": "2025-11-18T03:13:07.698Z",
+      "conversation": "mateussmcruz@icloud.com"
+    },
+    {
+      "id": "m_1763435588044",
+      "email": "ai@system",
+      "text": "Força, Mateus! Foque em uma ação simples hoje. Considere conversar com Mateus e Davi. (Fallback sem IA)",
+      "timestamp": "2025-11-18T03:13:08.044Z",
+      "conversation": "mateussmcruz@icloud.com"
     }
   ]
 }
